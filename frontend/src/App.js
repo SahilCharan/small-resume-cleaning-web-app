@@ -101,23 +101,24 @@ const FileUpload = ({ onFileUpload, uploading }) => {
   return (
     <div className="max-w-2xl mx-auto">
       <div
-        className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+        className={`border-3 border-dashed rounded-2xl p-12 text-center transition-all duration-300 ${
           dragOver 
-            ? 'border-blue-400 bg-blue-50' 
-            : 'border-gray-300 hover:border-gray-400'
-        }`}
+            ? 'border-blue-400 bg-gradient-to-br from-blue-50 to-purple-50 scale-105' 
+            : 'border-gray-300 hover:border-blue-400 bg-gradient-to-br from-gray-50 to-white hover:from-blue-50 hover:to-purple-50'
+        } shadow-lg hover:shadow-xl`}
         onDrop={handleDrop}
         onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
         onDragLeave={() => setDragOver(false)}
       >
-        <div className="mb-4">
-          <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+        <div className="mb-6">
+          <div className="text-6xl mb-4">📁</div>
+          <svg className="mx-auto h-16 w-16 text-gray-400 mb-4" stroke="currentColor" fill="none" viewBox="0 0 48 48">
             <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </div>
-        <div className="mb-4">
-          <p className="text-lg font-medium text-gray-900">Drop your resume here</p>
-          <p className="text-gray-500">or click to browse files</p>
+        <div className="mb-6">
+          <p className="text-2xl font-bold text-gray-900 mb-2">Drop your resume here</p>
+          <p className="text-gray-600 text-lg">or click to browse files</p>
         </div>
         <input
           type="file"
@@ -129,14 +130,23 @@ const FileUpload = ({ onFileUpload, uploading }) => {
         />
         <label
           htmlFor="file-upload"
-          className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 cursor-pointer ${
-            uploading ? 'opacity-50 cursor-not-allowed' : ''
+          className={`inline-flex items-center px-8 py-4 border border-transparent text-lg font-semibold rounded-xl shadow-lg transition-all duration-200 ${
+            uploading 
+              ? 'bg-gray-400 text-white cursor-not-allowed' 
+              : 'text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 cursor-pointer hover:scale-105 hover:shadow-xl'
           }`}
         >
+          <span className="text-xl mr-2">📤</span>
           {uploading ? 'Uploading...' : 'Select File'}
         </label>
-        <p className="mt-2 text-xs text-gray-500">
-          Supports PDF, DOCX, DOC, and TXT files (max 10MB)
+        <div className="mt-4 flex flex-wrap justify-center gap-2">
+          <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">📄 PDF</span>
+          <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">📝 DOCX</span>
+          <span className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-medium">📋 DOC</span>
+          <span className="px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm font-medium">📄 TXT</span>
+        </div>
+        <p className="mt-4 text-sm text-gray-500">
+          Maximum file size: <span className="font-semibold">10MB</span>
         </p>
       </div>
     </div>
@@ -148,36 +158,52 @@ const ProcessingStatus = ({ status, progress }) => {
   const getStatusColor = () => {
     switch (status) {
       case 'uploading': return 'text-blue-600';
-      case 'processing': return 'text-yellow-600';
+      case 'processing': return 'text-purple-600';
       case 'completed': return 'text-green-600';
       case 'error': return 'text-red-600';
       default: return 'text-gray-600';
     }
   };
 
+  const getStatusIcon = () => {
+    switch (status) {
+      case 'uploading': return '📤';
+      case 'processing': return '🤖';
+      case 'completed': return '✅';
+      case 'error': return '❌';
+      default: return '⏳';
+    }
+  };
+
   const getStatusText = () => {
     switch (status) {
-      case 'uploading': return 'Uploading file...';
-      case 'processing': return 'AI is cleaning your resume...';
-      case 'completed': return 'Processing completed!';
-      case 'error': return 'Processing failed';
-      default: return 'Ready';
+      case 'uploading': return 'Uploading your resume...';
+      case 'processing': return 'AI is analyzing and improving your resume...';
+      case 'completed': return 'Processing completed successfully!';
+      case 'error': return 'Processing failed - please try again';
+      default: return 'Ready to process';
     }
   };
 
   return (
     <div className="max-w-2xl mx-auto mb-6">
-      <div className="bg-white rounded-lg shadow p-4">
-        <div className={`font-medium mb-2 ${getStatusColor()}`}>
+      <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+        <div className={`font-bold text-lg mb-4 flex items-center gap-3 ${getStatusColor()}`}>
+          <span className="text-2xl">{getStatusIcon()}</span>
           {getStatusText()}
         </div>
         {status === 'processing' && (
-          <div className="w-full bg-gray-200 rounded-full h-2">
+          <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
             <div 
-              className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+              className="bg-gradient-to-r from-blue-500 to-purple-500 h-3 rounded-full transition-all duration-500 ease-out"
               style={{ width: `${progress}%` }}
             />
           </div>
+        )}
+        {status === 'processing' && (
+          <p className="text-sm text-gray-600 mt-3 text-center">
+            This may take up to 2 minutes... ☕
+          </p>
         )}
       </div>
     </div>

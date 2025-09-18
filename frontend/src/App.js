@@ -9,51 +9,68 @@ const API = `${BACKEND_URL}/api`;
 const WordChange = ({ change, onToggle }) => {
   const getChangeColor = (type) => {
     switch (type) {
-      case 'grammar': return 'bg-green-100 border-green-300 text-green-800';
-      case 'punctuation': return 'bg-blue-100 border-blue-300 text-blue-800';
-      case 'style': return 'bg-yellow-100 border-yellow-300 text-yellow-800';
-      default: return 'bg-gray-100 border-gray-300 text-gray-800';
+      case 'grammar': return 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-200 hover:border-green-300';
+      case 'punctuation': return 'bg-gradient-to-r from-blue-50 to-sky-50 border-blue-200 hover:border-blue-300';
+      case 'style': return 'bg-gradient-to-r from-purple-50 to-violet-50 border-purple-200 hover:border-purple-300';
+      default: return 'bg-gradient-to-r from-gray-50 to-slate-50 border-gray-200 hover:border-gray-300';
+    }
+  };
+
+  const getTypeIcon = (type) => {
+    switch (type) {
+      case 'grammar': return '📝';
+      case 'punctuation': return '✏️';
+      case 'style': return '🎨';
+      default: return '📋';
     }
   };
 
   return (
-    <div className={`p-3 border rounded-lg mb-2 ${getChangeColor(change.change_type)}`}>
+    <div className={`p-4 border-2 rounded-xl mb-3 transition-all duration-200 ${getChangeColor(change.change_type)} hover:shadow-md`}>
       <div className="flex justify-between items-start">
         <div className="flex-1">
-          <div className="text-sm font-medium mb-1">
-            {change.change_type.charAt(0).toUpperCase() + change.change_type.slice(1)} Change
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-lg">{getTypeIcon(change.change_type)}</span>
+            <span className="text-sm font-semibold text-gray-700">
+              {change.change_type.charAt(0).toUpperCase() + change.change_type.slice(1)} Improvement
+            </span>
           </div>
-          <div className="text-sm mb-2">
-            <span className="line-through text-red-600">{change.original}</span>
-            <span className="mx-2">→</span>
-            <span className="text-green-600 font-medium">{change.suggested}</span>
+          <div className="text-sm mb-3">
+            <div className="bg-red-100 border border-red-200 rounded-lg px-3 py-2 mb-2">
+              <span className="text-red-700 font-medium">Original: </span>
+              <span className="text-red-800 bg-red-200 px-2 py-1 rounded">{change.original}</span>
+            </div>
+            <div className="bg-green-100 border border-green-200 rounded-lg px-3 py-2">
+              <span className="text-green-700 font-medium">Suggested: </span>
+              <span className="text-green-800 bg-green-200 px-2 py-1 rounded font-medium">{change.suggested}</span>
+            </div>
           </div>
           {change.context && (
-            <div className="text-xs text-gray-600 italic">
-              Context: "...{change.context}..."
+            <div className="text-xs text-gray-600 italic bg-gray-50 rounded-lg px-3 py-2">
+              <span className="font-medium">Context:</span> "...{change.context}..."
             </div>
           )}
         </div>
-        <div className="ml-4 flex gap-2">
+        <div className="ml-4 flex flex-col gap-2">
           <button
             onClick={() => onToggle(change.id, 'accept')}
-            className={`px-3 py-1 text-xs rounded ${
+            className={`px-4 py-2 text-sm rounded-lg font-medium transition-all duration-200 ${
               change.accepted 
-                ? 'bg-green-600 text-white' 
-                : 'bg-white text-green-600 border border-green-600 hover:bg-green-50'
+                ? 'bg-green-600 text-white shadow-lg' 
+                : 'bg-white text-green-600 border-2 border-green-600 hover:bg-green-50 hover:shadow-md'
             }`}
           >
-            {change.accepted ? 'Accepted' : 'Accept'}
+            {change.accepted ? '✓ Accepted' : 'Accept'}
           </button>
           <button
             onClick={() => onToggle(change.id, 'reject')}
-            className={`px-3 py-1 text-xs rounded ${
+            className={`px-4 py-2 text-sm rounded-lg font-medium transition-all duration-200 ${
               !change.accepted 
-                ? 'bg-red-600 text-white' 
-                : 'bg-white text-red-600 border border-red-600 hover:bg-red-50'
+                ? 'bg-red-600 text-white shadow-lg' 
+                : 'bg-white text-red-600 border-2 border-red-600 hover:bg-red-50 hover:shadow-md'
             }`}
           >
-            {!change.accepted ? 'Rejected' : 'Reject'}
+            {!change.accepted ? '✗ Rejected' : 'Reject'}
           </button>
         </div>
       </div>

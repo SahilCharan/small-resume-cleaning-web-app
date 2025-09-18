@@ -155,6 +155,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ CHANGE DETECTION WORKING PERFECTLY: Successfully detected 4 word-level changes in test resume. Changes properly categorized as 'grammar', 'punctuation', and 'style'. Each change includes required fields: id, original, suggested, start_pos, end_pos, change_type, and context. Position tracking and change structure exactly match frontend expectations."
+      - working: true
+        agent: "testing"
+        comment: "✅ CHANGE DETECTION WITH ENCODING FIX VERIFIED: Successfully detected 5 word-level changes in PDF with special characters. Change detection algorithm correctly handles international characters and maintains accurate position tracking even with UTF-8 encoded text. No position calculation errors with multi-byte characters."
 
   - task: "Accept/reject change management"
     implemented: true

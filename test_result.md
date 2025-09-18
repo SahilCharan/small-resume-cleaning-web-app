@@ -237,11 +237,10 @@ metadata:
 
 test_plan:
   current_focus:
-    - "File upload API endpoint"
-    - "AI text cleaning with GPT-4o"
-    - "Word-level change detection"
     - "File upload UI with drag-drop"
     - "Side-by-side comparison view"
+    - "Word-level change highlighting and accept/reject"
+    - "Download functionality"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"

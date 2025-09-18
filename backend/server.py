@@ -83,13 +83,30 @@ async def extract_text_from_file(file_path: str, file_type: str) -> str:
         raise HTTPException(status_code=400, detail=f"Error extracting text: {str(e)}")
 
 async def extract_text_from_pdf(file_path: str) -> str:
-    """Extract text from PDF file"""
+    """Extract text from PDF file with encoding error handling"""
     text = ""
-    with open(file_path, 'rb') as file:
-        pdf_reader = PyPDF2.PdfReader(file)
-        for page in pdf_reader.pages:
-            text += page.extract_text() + "\n"
-    return text.strip()
+    try:
+        with open(file_path, 'rb') as file:
+            pdf_reader = PyPDF2.PdfReader(file)
+            for page in pdf_reader.pages:
+                page_text = page.extract_text()
+                # Handle encoding issues by cleaning the text
+                if page_text:
+                    # Remove surrogate characters and other problematic encodings
+                    clean_text = ''.join(char for char in page_text if ord(char) < 0xD800 or ord(char) > 0xDFFF)
+                    # Replace any remaining problematic characters
+                    clean_text = clean_text.encode('utf-8', 'ignore').decode('utf-8')
+                    text += clean_text + "\n"
+        
+        # If text is empty or too short, try alternative extraction
+        if len(text.strip()) < 10:
+            raise ValueError("PDF text extraction yielded insufficient content")
+            
+        return text.strip()
+        
+    except Exception as e:
+        # If PyPDF2 fails, provide a more helpful error message
+        raise ValueError(f"PDF text extraction failed: {str(e)}. Please ensure the PDF contains extractable text and is not a scanned image.")
 
 async def extract_text_from_docx(file_path: str) -> str:
     """Extract text from DOCX file"""

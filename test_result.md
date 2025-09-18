@@ -137,6 +137,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ AI INTEGRATION FULLY FUNCTIONAL: GPT-4o successfully processes resume text and makes intelligent improvements. Tested with realistic resume containing grammar errors ('I was working' → 'I worked', 'My responsibilities was' → 'My responsibilities were'). AI correctly preserves original structure while improving grammar, punctuation, and style. LiteLLM logs confirm successful API calls to OpenAI."
+      - working: true
+        agent: "testing"
+        comment: "✅ AI PROCESSING WITH SPECIAL CHARACTERS VERIFIED: Successfully processed PDF and TXT files containing international characters (María, José, González, São, résumé, naïve, coöperative). AI correctly handles UTF-8 encoded text and maintains special characters while making grammar improvements. No encoding-related processing failures detected."
 
   - task: "Word-level change detection"
     implemented: true

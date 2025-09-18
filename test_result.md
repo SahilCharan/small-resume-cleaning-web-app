@@ -119,6 +119,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ COMPREHENSIVE TESTING PASSED: File upload API working perfectly. Successfully tested TXT file upload with proper text extraction and database storage. File validation correctly rejects invalid file types (.xyz). File size validation and text extraction working as expected. API returns proper file_id for subsequent processing."
+      - working: true
+        agent: "testing"
+        comment: "✅ PDF ENCODING FIX VERIFIED: Successfully tested PDF upload with challenging characters (María, José, González, São, résumé, naïve, coöperative). The extract_text_from_pdf function correctly handles UTF-16 encoding issues and surrogate characters. No more encoding errors during PDF text extraction. Both TXT and PDF files with special characters process correctly."
 
   - task: "AI text cleaning with GPT-4o"
     implemented: true

@@ -86,31 +86,159 @@ async def extract_text_from_file(file_path: str, file_type: str) -> str:
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Error extracting text: {str(e)}")
 
-async def extract_text_from_pdf(file_path: str) -> str:
-    """Extract text from PDF file with encoding error handling"""
-    text = ""
+def clean_extracted_text(text: str) -> str:
+    """Clean and normalize extracted text to handle encoding issues"""
+    if not text:
+        return ""
+    
     try:
-        with open(file_path, 'rb') as file:
-            pdf_reader = PyPDF2.PdfReader(file)
-            for page in pdf_reader.pages:
-                page_text = page.extract_text()
-                # Handle encoding issues by cleaning the text
-                if page_text:
-                    # Remove surrogate characters and other problematic encodings
-                    clean_text = ''.join(char for char in page_text if ord(char) < 0xD800 or ord(char) > 0xDFFF)
-                    # Replace any remaining problematic characters
-                    clean_text = clean_text.encode('utf-8', 'ignore').decode('utf-8')
-                    text += clean_text + "\n"
+        # Normalize Unicode characters
+        text = unicodedata.normalize('NFKD', text)
         
-        # If text is empty or too short, try alternative extraction
-        if len(text.strip()) < 10:
-            raise ValueError("PDF text extraction yielded insufficient content")
-            
+        # Remove control characters and fix common encoding issues
+        # Keep basic punctuation and alphanumeric characters
+        cleaned_chars = []
+        for char in text:
+            # Keep printable ASCII characters and common Unicode characters
+            if (ord(char) >= 32 and ord(char) <= 126) or char in '\n\t\r' or ord(char) >= 160:
+                cleaned_chars.append(char)
+            elif char.isspace():
+                cleaned_chars.append(' ')
+        
+        text = ''.join(cleaned_chars)
+        
+        # Clean up extra whitespace and line breaks
+        text = re.sub(r'\n\s*\n\s*\n+', '\n\n', text)  # Multiple blank lines to double
+        text = re.sub(r'[ \t]+', ' ', text)  # Multiple spaces/tabs to single space
+        text = re.sub(r'[ \t]*\n[ \t]*', '\n', text)  # Clean line breaks
+        
         return text.strip()
         
     except Exception as e:
-        # If PyPDF2 fails, provide a more helpful error message
-        raise ValueError(f"PDF text extraction failed: {str(e)}. Please ensure the PDF contains extractable text and is not a scanned image.")
+        # If all else fails, try basic ASCII cleanup
+        try:
+            text = text.encode('ascii', 'ignore').decode('ascii')
+            return re.sub(r'\s+', ' ', text).strip()
+        except:
+            return str(text)
+
+def validate_pdf_file(file_path: str) -> tuple[bool, str]:
+    """Validate PDF file before processing"""
+    try:
+        # Check if file exists and has content
+        if not os.path.exists(file_path) or os.path.getsize(file_path) == 0:
+            return False, "PDF file is empty or doesn't exist"
+        
+        # Check PDF header
+        with open(file_path, 'rb') as f:
+            header = f.read(8)
+            if not header.startswith(b'%PDF'):
+                return False, "File is not a valid PDF"
+        
+        # Try to open with PyMuPDF for basic validation
+        try:
+            doc = fitz.open(file_path)
+            page_count = doc.page_count
+            doc.close()
+            
+            if page_count == 0:
+                return False, "PDF contains no pages"
+                
+            return True, f"PDF is valid with {page_count} pages"
+            
+        except Exception as e:
+            return False, f"PDF structure validation failed: {str(e)}"
+        
+    except Exception as e:
+        return False, f"PDF validation error: {str(e)}"
+
+async def extract_text_from_pdf(file_path: str) -> str:
+    """Multi-method PDF text extraction with fallback strategies"""
+    
+    # First validate the PDF
+    is_valid, validation_msg = validate_pdf_file(file_path)
+    if not is_valid:
+        raise ValueError(f"PDF validation failed: {validation_msg}")
+    
+    text = ""
+    extraction_method = "none"
+    
+    # Method 1: Try pdfplumber first (best for formatted text)
+    try:
+        with pdfplumber.open(file_path) as pdf:
+            for page in pdf.pages:
+                page_text = page.extract_text()
+                if page_text:
+                    text += page_text + "\n"
+        
+        if text.strip() and len(text.strip()) > 10:
+            extraction_method = "pdfplumber"
+            logger.info(f"PDF extraction successful with pdfplumber: {len(text)} characters")
+            return clean_extracted_text(text)
+    except Exception as e:
+        logger.warning(f"pdfplumber extraction failed: {e}")
+    
+    # Method 2: Try PyMuPDF (handles complex PDFs better)
+    try:
+        doc = fitz.open(file_path)
+        text = ""
+        for page_num in range(doc.page_count):
+            page = doc.load_page(page_num)
+            page_text = page.get_text()
+            if page_text:
+                text += page_text + "\n"
+        doc.close()
+        
+        if text.strip() and len(text.strip()) > 10:
+            extraction_method = "PyMuPDF"
+            logger.info(f"PDF extraction successful with PyMuPDF: {len(text)} characters")
+            return clean_extracted_text(text)
+    except Exception as e:
+        logger.warning(f"PyMuPDF extraction failed: {e}")
+    
+    # Method 3: Try pdfminer as fallback
+    try:
+        text = pdfminer_extract_text(file_path)
+        if text and text.strip() and len(text.strip()) > 10:
+            extraction_method = "pdfminer"
+            logger.info(f"PDF extraction successful with pdfminer: {len(text)} characters")
+            return clean_extracted_text(text)
+    except Exception as e:
+        logger.warning(f"pdfminer extraction failed: {e}")
+    
+    # Method 4: Try PyPDF2 as final fallback
+    try:
+        with open(file_path, 'rb') as file:
+            pdf_reader = PyPDF2.PdfReader(file)
+            text = ""
+            for page in pdf_reader.pages:
+                page_text = page.extract_text()
+                if page_text:
+                    text += page_text + "\n"
+        
+        if text.strip() and len(text.strip()) > 10:
+            extraction_method = "PyPDF2"
+            logger.info(f"PDF extraction successful with PyPDF2: {len(text)} characters")
+            return clean_extracted_text(text)
+    except Exception as e:
+        logger.warning(f"PyPDF2 extraction failed: {e}")
+    
+    # If all methods fail, provide detailed error message
+    error_msg = f"""PDF text extraction failed with all methods (pdfplumber, PyMuPDF, pdfminer, PyPDF2).
+
+Possible causes:
+1. PDF contains only scanned images (no extractable text)
+2. PDF is password protected
+3. PDF has unusual encoding or format
+4. PDF is corrupted
+
+Recommendations:
+1. Try converting your resume to DOCX or TXT format
+2. If it's a scanned PDF, use OCR software first
+3. Recreate the PDF from the original document
+4. Ensure the PDF contains selectable text (not just images)"""
+    
+    raise ValueError(error_msg)
 
 async def extract_text_from_docx(file_path: str) -> str:
     """Extract text from DOCX file"""

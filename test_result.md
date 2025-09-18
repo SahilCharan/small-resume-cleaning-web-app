@@ -101,3 +101,136 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: Create an AI-powered resume cleaning web application that automatically detects and corrects grammatical errors, punctuation mistakes, and improves overall text quality while maintaining original formatting. The app should support PDF, DOCX, TXT formats with word-level change highlighting and accept/reject functionality.
+
+backend:
+  - task: "File upload API endpoint"
+    implemented: true  
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented file upload endpoint with validation for PDF, DOCX, DOC, TXT formats. Max 10MB limit. Includes text extraction functionality."
+
+  - task: "AI text cleaning with GPT-4o"
+    implemented: true
+    working: "NA" 
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Integrated GPT-4o using emergentintegrations library with Emergent Universal Key. AI system message optimized for resume grammar/punctuation cleaning."
+
+  - task: "Word-level change detection"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py" 
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Built word-level diff detection using difflib to identify grammar, punctuation, and style changes between original and cleaned text."
+
+  - task: "Accept/reject change management"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "API endpoints for toggling individual word changes. Database stores accepted/rejected status for each change."
+
+  - task: "Final text generation with applied changes"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Endpoint to generate final resume text with only accepted changes applied, maintaining original formatting."
+
+frontend:
+  - task: "File upload UI with drag-drop"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Clean, minimalist upload interface with drag-drop support, file validation, and progress indicators. Grammarly-style design."
+
+  - task: "Side-by-side comparison view"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Split-screen layout showing original vs cleaned text with responsive design."
+
+  - task: "Word-level change highlighting and accept/reject"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Individual word changes displayed with color coding (green=grammar, blue=punctuation, yellow=style). Accept/reject buttons for each change."
+
+  - task: "Download functionality"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Download cleaned resume with applied changes. Currently outputs as TXT format."
+
+metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 0
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "File upload API endpoint"
+    - "AI text cleaning with GPT-4o"
+    - "Word-level change detection"
+    - "File upload UI with drag-drop"
+    - "Side-by-side comparison view"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "main"
+    message: "Built complete AI-powered resume cleaning MVP with GPT-4o integration, word-level change management, and professional UI. Ready for backend testing to verify file upload, AI processing, and change detection workflows."

@@ -16,9 +16,13 @@ import tempfile
 import shutil
 from emergentintegrations.llm.chat import LlmChat, UserMessage
 import PyPDF2
+import pdfplumber
+from pdfminer.high_level import extract_text as pdfminer_extract_text
+import fitz  # PyMuPDF
 import docx
 import difflib
 import re
+import unicodedata
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')

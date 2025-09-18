@@ -308,21 +308,24 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       {/* Header */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <header className="bg-gradient-to-r from-blue-600 to-purple-600 shadow-lg">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Resume Cleaner</h1>
-              <p className="text-gray-600">AI-powered resume grammar and style enhancement</p>
+              <h1 className="text-3xl font-bold text-white flex items-center gap-3">
+                <span className="text-4xl">🚀</span>
+                Resume Cleaner
+              </h1>
+              <p className="text-blue-100 mt-1">AI-powered resume grammar and style enhancement</p>
             </div>
             {currentStep === 'results' && (
               <button
                 onClick={resetApp}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+                className="px-6 py-3 text-sm font-medium text-white bg-white/20 border border-white/30 rounded-lg hover:bg-white/30 transition-all duration-200 backdrop-blur-sm"
               >
-                Clean Another Resume
+                🔄 Clean Another Resume
               </button>
             )}
           </div>
@@ -332,13 +335,16 @@ function App() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {error && (
           <div className="max-w-2xl mx-auto mb-6">
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-              <div className="text-red-800">{error}</div>
+            <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4 shadow-sm">
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">⚠️</span>
+                <div className="text-red-800 font-medium">{error}</div>
+              </div>
               <button
                 onClick={() => setError(null)}
-                className="mt-2 text-sm text-red-600 hover:text-red-800"
+                className="mt-3 text-sm text-red-600 hover:text-red-800 font-medium"
               >
-                Dismiss
+                ✕ Dismiss
               </button>
             </div>
           </div>
@@ -347,11 +353,11 @@ function App() {
         {currentStep === 'upload' && (
           <div>
             <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
                 Upload Your Resume
               </h2>
-              <p className="text-lg text-gray-600">
-                Get professional grammar and style improvements with AI
+              <p className="text-xl text-gray-600">
+                Get professional grammar and style improvements with AI ✨
               </p>
             </div>
             <FileUpload 
@@ -364,9 +370,10 @@ function App() {
         {(currentStep === 'processing' || processingStatus !== 'ready') && currentStep !== 'results' && (
           <div>
             <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
                 Processing Your Resume
               </h2>
+              <p className="text-lg text-gray-600">Our AI is working its magic... 🪄</p>
             </div>
             <ProcessingStatus status={processingStatus} progress={progress} />
           </div>
@@ -375,34 +382,44 @@ function App() {
         {currentStep === 'results' && resumeData && (
           <div>
             <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              <h2 className="text-4xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent mb-4">
                 Review Changes
               </h2>
-              <p className="text-lg text-gray-600">
-                Found {resumeData.changes.length} improvements. Review and accept the changes you want.
-              </p>
+              <div className="bg-gradient-to-r from-green-100 to-blue-100 rounded-xl p-4 inline-block">
+                <p className="text-lg text-gray-700">
+                  <span className="text-2xl mr-2">🎉</span>
+                  Found <span className="font-bold text-green-600">{resumeData.changes.length}</span> improvements! 
+                  Review and accept the changes you want.
+                </p>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Original Text */}
-              <div className="bg-white rounded-lg shadow">
-                <div className="px-6 py-4 border-b border-gray-200">
-                  <h3 className="text-lg font-medium text-gray-900">Original Text</h3>
+              <div className="bg-white rounded-2xl shadow-lg border border-red-100">
+                <div className="px-6 py-4 border-b border-red-100 bg-gradient-to-r from-red-50 to-pink-50">
+                  <h3 className="text-lg font-semibold text-red-800 flex items-center gap-2">
+                    <span className="text-xl">📄</span>
+                    Original Text
+                  </h3>
                 </div>
-                <div className="p-6">
-                  <div className="text-sm text-gray-700 whitespace-pre-wrap font-mono">
+                <div className="p-6 max-h-96 overflow-y-auto custom-scrollbar">
+                  <div className="text-sm text-gray-700 whitespace-pre-wrap font-mono leading-relaxed">
                     {resumeData.original_text}
                   </div>
                 </div>
               </div>
 
               {/* Cleaned Text Preview */}
-              <div className="bg-white rounded-lg shadow">
-                <div className="px-6 py-4 border-b border-gray-200">
-                  <h3 className="text-lg font-medium text-gray-900">Cleaned Text</h3>
+              <div className="bg-white rounded-2xl shadow-lg border border-green-100">
+                <div className="px-6 py-4 border-b border-green-100 bg-gradient-to-r from-green-50 to-emerald-50">
+                  <h3 className="text-lg font-semibold text-green-800 flex items-center gap-2">
+                    <span className="text-xl">✨</span>
+                    Improved Text
+                  </h3>
                 </div>
-                <div className="p-6">
-                  <div className="text-sm text-gray-700 whitespace-pre-wrap font-mono">
+                <div className="p-6 max-h-96 overflow-y-auto custom-scrollbar">
+                  <div className="text-sm text-gray-700 whitespace-pre-wrap font-mono leading-relaxed">
                     {resumeData.cleaned_text}
                   </div>
                 </div>
@@ -412,13 +429,25 @@ function App() {
             {/* Changes List */}
             {resumeData.changes.length > 0 && (
               <div className="mt-8">
-                <div className="bg-white rounded-lg shadow">
-                  <div className="px-6 py-4 border-b border-gray-200">
-                    <h3 className="text-lg font-medium text-gray-900">
+                <div className="bg-white rounded-2xl shadow-lg">
+                  <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-blue-50">
+                    <h3 className="text-xl font-semibold text-gray-800 flex items-center gap-3">
+                      <span className="text-2xl">🔍</span>
                       Suggested Changes ({resumeData.changes.length})
+                      <div className="ml-auto flex gap-2">
+                        <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                          📝 Grammar
+                        </span>
+                        <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                          ✏️ Punctuation
+                        </span>
+                        <span className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-medium">
+                          🎨 Style
+                        </span>
+                      </div>
                     </h3>
                   </div>
-                  <div className="p-6 max-h-96 overflow-y-auto">
+                  <div className="p-6 max-h-96 overflow-y-auto custom-scrollbar">
                     {resumeData.changes.map((change) => (
                       <WordChange
                         key={change.id}
@@ -433,18 +462,21 @@ function App() {
 
             {/* Download Section */}
             <div className="mt-8 text-center">
-              <button
-                onClick={handleDownload}
-                className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-              >
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                Download Cleaned Resume
-              </button>
-              <p className="mt-2 text-sm text-gray-500">
-                Applied changes: {resumeData.changes.filter(c => c.accepted).length} of {resumeData.changes.length}
-              </p>
+              <div className="bg-gradient-to-r from-green-400 to-blue-500 rounded-2xl p-8 shadow-lg">
+                <button
+                  onClick={handleDownload}
+                  className="inline-flex items-center px-8 py-4 border border-transparent text-lg font-semibold rounded-xl shadow-lg text-white bg-white/20 hover:bg-white/30 focus:outline-none focus:ring-4 focus:ring-white/50 transition-all duration-200 backdrop-blur-sm"
+                >
+                  <svg className="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  Download Cleaned Resume
+                </button>
+                <p className="mt-4 text-white text-lg">
+                  <span className="text-xl mr-2">✅</span>
+                  Applied changes: <span className="font-bold">{resumeData.changes.filter(c => c.accepted).length}</span> of {resumeData.changes.length}
+                </p>
+              </div>
             </div>
           </div>
         )}

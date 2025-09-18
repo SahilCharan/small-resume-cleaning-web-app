@@ -5,14 +5,18 @@ import axios from 'axios';
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-// Component for individual word changes
+// Component for individual word changes with soothing colors
 const WordChange = ({ change, onToggle }) => {
-  const getChangeColor = (type) => {
+  const getChangeStyle = (type) => {
     switch (type) {
-      case 'grammar': return 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-200 hover:border-green-300';
-      case 'punctuation': return 'bg-gradient-to-r from-blue-50 to-sky-50 border-blue-200 hover:border-blue-300';
-      case 'style': return 'bg-gradient-to-r from-purple-50 to-violet-50 border-purple-200 hover:border-purple-300';
-      default: return 'bg-gradient-to-r from-gray-50 to-slate-50 border-gray-200 hover:border-gray-300';
+      case 'grammar': 
+        return 'change-type-badge grammar';
+      case 'punctuation': 
+        return 'change-type-badge punctuation';
+      case 'style': 
+        return 'change-type-badge style';
+      default: 
+        return 'change-type-badge grammar';
     }
   };
 
@@ -26,51 +30,73 @@ const WordChange = ({ change, onToggle }) => {
   };
 
   return (
-    <div className={`p-4 border-2 rounded-xl mb-3 transition-all duration-200 ${getChangeColor(change.change_type)} hover:shadow-md`}>
+    <div className="word-change-card change-item">
       <div className="flex justify-between items-start">
         <div className="flex-1">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-lg">{getTypeIcon(change.change_type)}</span>
-            <span className="text-sm font-semibold text-gray-700">
-              {change.change_type.charAt(0).toUpperCase() + change.change_type.slice(1)} Improvement
+          <div className="flex items-center gap-3 mb-4">
+            <span className="text-xl">{getTypeIcon(change.change_type)}</span>
+            <span className={getChangeStyle(change.change_type)}>
+              {change.change_type} Fix
             </span>
           </div>
-          <div className="text-sm mb-3">
-            <div className="bg-red-100 border border-red-200 rounded-lg px-3 py-2 mb-2">
-              <span className="text-red-700 font-medium">Original: </span>
-              <span className="text-red-800 bg-red-200 px-2 py-1 rounded">{change.original}</span>
+          
+          {/* Error highlighting in soft red */}
+          <div className="mb-3">
+            <div className="text-sm font-medium mb-2" style={{color: 'var(--error-text)'}}>
+              Original (Error):
             </div>
-            <div className="bg-green-100 border border-green-200 rounded-lg px-3 py-2">
-              <span className="text-green-700 font-medium">Suggested: </span>
-              <span className="text-green-800 bg-green-200 px-2 py-1 rounded font-medium">{change.suggested}</span>
+            <div className="original-text" style={{padding: '12px', background: 'var(--error-bg)', border: '1px solid var(--error-border)'}}>
+              <span className="error-highlight">{change.original}</span>
             </div>
           </div>
+          
+          {/* Correction highlighting in soft green */}
+          <div className="mb-4">
+            <div className="text-sm font-medium mb-2" style={{color: 'var(--success-text)'}}>
+              Suggested (Correction):
+            </div>
+            <div className="improved-text" style={{padding: '12px', background: 'var(--success-bg)', border: '1px solid var(--success-border)'}}>
+              <span className="correction-highlight">{change.suggested}</span>
+            </div>
+          </div>
+          
           {change.context && (
-            <div className="text-xs text-gray-600 italic bg-gray-50 rounded-lg px-3 py-2">
+            <div className="text-xs italic p-3 rounded-lg" style={{background: 'var(--bg-secondary)', color: 'var(--text-muted)'}}>
               <span className="font-medium">Context:</span> "...{change.context}..."
             </div>
           )}
         </div>
-        <div className="ml-4 flex flex-col gap-2">
+        
+        <div className="ml-6 flex flex-col gap-3">
           <button
             onClick={() => onToggle(change.id, 'accept')}
             className={`px-4 py-2 text-sm rounded-lg font-medium transition-all duration-200 ${
               change.accepted 
-                ? 'bg-green-600 text-white shadow-lg' 
-                : 'bg-white text-green-600 border-2 border-green-600 hover:bg-green-50 hover:shadow-md'
+                ? 'text-white shadow-lg' 
+                : 'border-2 hover:shadow-md'
             }`}
+            style={{
+              backgroundColor: change.accepted ? 'var(--success-text)' : 'transparent',
+              borderColor: 'var(--success-text)',
+              color: !change.accepted ? 'var(--success-text)' : 'white'
+            }}
           >
-            {change.accepted ? '✓ Accepted' : 'Accept'}
+            {change.accepted ? '✓ Applied' : 'Apply Fix'}
           </button>
           <button
             onClick={() => onToggle(change.id, 'reject')}
             className={`px-4 py-2 text-sm rounded-lg font-medium transition-all duration-200 ${
               !change.accepted 
-                ? 'bg-red-600 text-white shadow-lg' 
-                : 'bg-white text-red-600 border-2 border-red-600 hover:bg-red-50 hover:shadow-md'
+                ? 'text-white shadow-lg' 
+                : 'border-2 hover:shadow-md'
             }`}
+            style={{
+              backgroundColor: !change.accepted ? 'var(--error-text)' : 'transparent',
+              borderColor: 'var(--error-text)',
+              color: change.accepted ? 'var(--error-text)' : 'white'
+            }}
           >
-            {!change.accepted ? '✗ Rejected' : 'Reject'}
+            {!change.accepted ? '✗ Ignored' : 'Ignore'}
           </button>
         </div>
       </div>
